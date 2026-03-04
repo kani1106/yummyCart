@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 let conn = null;
 
 const connectDB = async () => {
@@ -11,24 +10,14 @@ const connectDB = async () => {
 module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-  try {
-    await connectDB();
+  await connectDB();
 
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    const userSchema = new mongoose.Schema({
-      name: String,
-      email: String,
-      password: String,
-    });
+  const userSchema = new mongoose.Schema({ name: String, email: String, password: String });
+  const User = mongoose.models.User || mongoose.model("User", userSchema);
 
-    const User = mongoose.models.User || mongoose.model("User", userSchema);
-
-    const user = await User.findOne({ email, password });
-
-    if (user) res.status(200).json({ message: "Login Successful ✅" });
-    else res.status(400).json({ message: "Invalid Credentials ❌" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  const user = await User.findOne({ email, password });
+  if (user) res.status(200).json({ message: "Login Successful ✅" });
+  else res.status(400).json({ message: "Invalid Credentials ❌" });
 };
